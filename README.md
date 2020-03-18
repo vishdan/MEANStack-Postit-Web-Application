@@ -1,7 +1,9 @@
 # MeanStack
 
+ This contains Two-Way Binding 
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.6.
-\nThis contains Two-Way Binding 
+
 
 ## Development server
 
