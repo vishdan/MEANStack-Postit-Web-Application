@@ -10,8 +10,6 @@ import { PostServices } from '../post.service';
 })
 export class PostCreateComponent {
   constructor(public postservices:PostServices){}
-  enteredTitle = "";
-  enteredContent = "";
 
   onAddPost(form: NgForm) {
     if (form.invalid) {
