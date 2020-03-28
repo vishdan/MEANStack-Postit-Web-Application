@@ -10,17 +10,24 @@ import { PostServices } from '../post.service';
   styleUrls: ["./post-list.component.css"]
 })
 export class PostListComponent implements OnInit,OnDestroy{
+  posts: Post[] = []
+  isLoading = false;
 
   constructor(public postServices:PostServices){}               //To inject
-  posts: Post[] = []
   private postSub : Subscription;      // To subcribe and unsubcribe only when required (to prevent memory leaks)
 
   ngOnInit(){
+     this.isLoading = true
      this.postServices.getPosts();
      this.postSub = this.postServices.getPostsUpdateListner()
       .subscribe((posts: Post[])=>{
         this.posts = posts
+        this.isLoading = false
       })
+  }
+
+  postDelete(postid: string){
+    this.postServices.deletePost(postid);
   }
 
   ngOnDestroy(){

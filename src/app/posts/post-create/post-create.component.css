@@ -8,3 +8,15 @@ textarea {
   width: 100%;
 }
 
+mat-spinner{
+  margin: auto;
+}
+
+input[type=file]{
+  display: none;
+}
+
+#filePicker{
+  width: 80%;
+  margin: 1rem;
+}

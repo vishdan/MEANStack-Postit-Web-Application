@@ -1,19 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const Post = require("../backend/models/posts")
+const postRoutes = require("./routes/posts");
 
 const app = express();
-mongoose.connect("mongodb://localhost:27017/postit")
-  .then(()=>{
-    console.log("Connected to Local Database")
+mongoose
+  .connect("mongodb://localhost:27017/postit", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
   })
-  .catch(()=>{
-    console.log("Failed")
+  .then(() => {
+    console.log("Connected to Local Database");
   })
+  .catch(() => {
+    console.log("Failed");
+  });
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -23,31 +28,11 @@ app.use((req, res, next) => {
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, OPTIONS"
+    "GET, POST,PUT ,PATCH, DELETE, OPTIONS"
   );
   next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content
-  });
-  console.log(post);
-  post.save();
-  res.status(201).json({
-    message: 'Post added sucessfully'
-  })
-});
-
-app.use("/api/posts", (req, res, next) => {
-  Post.find()
-    .then((documents)=>{
-      res.status(200).json({
-        message: "OK 200",
-        posts: documents
-      });
-    })
-});
+app.use("/api/posts", postRoutes)
 
 module.exports = app;
