@@ -1,18 +1,51 @@
 const express = require("express");
+const multer = require("multer");
 
-const Post = require("../models/posts")
+const Post = require("../models/posts");
 
 const routes = express.Router();
 
-routes.post("", (req, res, next) => {
+const MIME_TYPE_MAP = {
+  "image/jpg": "jpg",
+  "image/jpeg": "jpeg",
+  "image/png": "png"
+};
+
+
+// Configuration for multer
+const storage = multer.diskStorage({
+  destination: (reg, file, cb) => {
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let error = new Error("Invalid mime type");
+    if (isValid) {
+      error = null;
+    }
+    cb(error, "backend/images");
+  },
+  filename: (reg, file, cb) => {
+    const name = file.originalname
+      .toLowerCase()
+      .split(/[\s.]+/)
+      .join("-");
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    cb(null, name + "-" + Date.now() + "." + ext);
+  }
+});
+
+routes.post("",multer({storage:storage}).single('image') ,(req, res, next) => {
+  const url = req.protocol + '://' + req.get("host");
   const post = new Post({
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + "/images/" + req.file.filename
   });
   post.save().then(createdPost => {
     res.status(201).json({
       message: "Post added successfully",
-      id: createdPost._id
+      post:{
+        ...createdPost,
+        id: createdPost._id,
+      }
     });
   });
 });
@@ -38,11 +71,19 @@ routes.get("/:id", (req, res, next) => {
   });
 });
 
-routes.put("/:id", (req, res, next) => {
+routes.put("/:id",multer({storage:storage}).single('image'), (req, res, next) => {
+  let imagePath = req.body.imagePath;
+
+  if(req.file){
+    const url = req.protocol + '://' + req.get("host");
+    imagePath = url + "/images/" + req.file.filename;
+  }
+
   const post = new Post({
     _id: req.params.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: imagePath
   });
   Post.updateOne({ _id: req.params.id }, post).then(result => {
     console.log(result);
@@ -59,4 +100,4 @@ routes.delete("/:id", (req, res, next) => {
   });
 });
 
-module.exports = routes
+module.exports = routes;

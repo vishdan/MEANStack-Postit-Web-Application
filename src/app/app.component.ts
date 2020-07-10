@@ -9,7 +9,7 @@ import { Post } from './posts/post.model';
 })
 export class AppComponent {
   storedPosts: Post[] = [];
-
+  title = 'app'
   onPostAdded(post) {
     this.storedPosts.push(post);
   }
